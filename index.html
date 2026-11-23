@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self' https: blob: data:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; font-src 'self' data:; frame-src 'self' blob:;">
+<title>LernHub</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#15171c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LernHub">
+</head>
+<body>
+<header id="titlebar">
+  <div class="tb-left"><span class="tb-led"></span>LernHub</div>
+  <div class="tb-btns">
+    <button class="tb-btn" id="tb-min" aria-label="Minimieren"><svg viewBox="0 0 12 12"><path d="M1 6h10" stroke="currentColor" stroke-width="1.2"/></svg></button>
+    <button class="tb-btn" id="tb-max" aria-label="Maximieren"><svg viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
+    <button class="tb-btn close" id="tb-close" aria-label="Schließen"><svg viewBox="0 0 12 12"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9" stroke="currentColor" stroke-width="1.2"/></svg></button>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Hauptnavigation">
+    <div class="brand"><b>Lern<i>Hub</i></b></div>
+    <div class="nav" id="nav">
+      <span class="nav-ind" id="nav-ind"></span>
+      <button class="nav-btn" data-go="home">Start</button>
+      <button class="nav-btn" data-go="timetable">Stundenplan</button>
+      <button class="nav-btn" data-go="subjects">Fächer</button>
+      <button class="nav-btn" data-go="plan">Plan</button>
+      <button class="nav-btn" data-go="school">Schule</button>
+      <button class="nav-btn" data-go="mistakes" id="nav-mistakes">Fehlerheft<span class="k"></span></button>
+      <button class="nav-btn" data-go="achievements">Erfolge</button>
+      <button class="nav-btn" data-go="shop">Shop</button>
+      <button class="nav-btn" data-go="break" id="nav-break">Pause</button>
+      <button class="nav-btn nav-more" data-action="more" aria-label="Weitere Bereiche">Mehr</button>
+    </div>
+    <div class="rail-foot">
+      <button class="rail-j" id="rail-j"><span class="led"></span><div><b>JARVIS</b><small id="rail-j-t">Strg+Umschalt+Leertaste</small></div></button>
+      <button class="rail-set" id="open-settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Optionen</button>
+    </div>
+  </nav>
+
+  <section class="main">
+    <div class="topbar">
+      <div class="readout lvl">
+        <div class="top"><small>Level <b class="mono" id="hud-lvl" style="font-size:11px;color:var(--ink)">1</b></small><small id="hud-xp">0 / 50 XP</small></div>
+        <div class="meter" id="hud-meter" style="--n:30;--h:7px;margin-top:2px"></div>
+      </div>
+      <span class="sep hide-m"></span>
+      <div class="readout"><small>Streak</small><b id="hud-streak">0 T</b></div>
+      <div class="readout"><small>Münzen</small><b id="hud-coins">0</b></div>
+      <span class="sep hide-m"></span>
+      <div class="readout hide-m"><small>Pause frei</small><b id="hud-break">05:00</b></div>
+      <div class="readout hide-m"><small>Nächste in</small><b id="hud-next">25:00</b></div>
+      <button class="btn sm primary m-set m-jarvis" id="jarvis-m" aria-label="JARVIS öffnen">JARVIS</button>
+      <button class="icon-btn m-set" id="open-settings-m" aria-label="Optionen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+    </div>
+    <div id="view"></div>
+  </section>
+
+  <aside class="jarvis" id="jarvis" data-state="idle" aria-label="JARVIS">
+    <div class="j-in">
+      <div class="j-head"><b>JARVIS</b><span class="j-state"><i></i><span id="j-state-t">Bereit</span></span><button class="icon-btn" id="j-close" aria-label="JARVIS schließen"><svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      <div class="j-viz">
+        <canvas id="j-canvas"></canvas>
+        <button class="mic" id="j-mic" aria-label="Sprechen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg></button>
+        <div class="j-hint" id="j-hint">Klicken oder Strg+Umschalt+Leertaste</div>
+      </div>
+      <div class="dl" id="j-dl"><span id="j-dl-t">Spracherkennung wird geladen …</span><div class="meter thin" id="j-dl-m" style="--n:24"></div></div>
+      <div class="j-log" id="j-log"></div>
+      <div class="j-sugs" id="j-sugs"></div>
+      <form class="j-form" id="j-form"><input class="input" id="j-in" placeholder="Schreib JARVIS …" autocomplete="off"><button class="btn primary" aria-label="Senden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+    </div>
+  </aside>
+</div>
+
+<canvas id="confetti"></canvas>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="pwa.js"></script>
+<script src="bridge.js"></script>
+<script src="ai-core.js"></script>
+<script src="untis-core.js"></script>
+<script src="mobile-api.js"></script>
+<script src="qrcode.js"></script>
+<script src="starter.js"></script>
+<script src="app.js"></script>
+<script src="games.js"></script>
+<script src="games2.js"></script>
+<script src="modes.js"></script>
+<script src="school.js"></script>
+<script src="timetable.js"></script>
+<script src="vocab.js"></script>
+<script src="extras.js"></script>
+<script src="sync-merge.js"></script>
+<script src="abgleich.js"></script>
+<script src="jarvis.js"></script>
+<script src="eggs.js"></script>
+</body>
+</html>
