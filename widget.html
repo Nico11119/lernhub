@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'">
+<title>LernHub Widget</title>
+<style>
+@font-face { font-family: "Bricolage"; src: url("fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "JB Mono"; src: url("fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); font-weight: 100 800; }
+:root { --bg: #f4f0e6; --panel: #fbf8f1; --ink: #1e2330; --ink-3: #7a7f8c; --line: #e2dccd; --signal: #2f4fe0; --bad: #d6336c; --ok: #2f9e44; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #15171c; --panel: #1c1f26; --ink: #ece8df; --ink-3: #7e838f; --line: #2b3039; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #15171c; --panel: #1c1f26; --ink: #ece8df; --ink-3: #7e838f; --line: #2b3039; color-scheme: dark; }
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { background: var(--bg); color: var(--ink); font: 13px/1.35 "Bricolage", system-ui, sans-serif; -webkit-app-region: drag; user-select: none; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; border: 1px solid var(--line); }
+header { display: flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+header b { color: var(--signal); }
+header span { flex: 1; }
+button { -webkit-app-region: no-drag; border: 0; background: none; color: var(--ink-3); font: inherit; cursor: pointer; border-radius: 6px; padding: 2px 6px; }
+button:hover { background: var(--panel); color: var(--ink); }
+.row { display: flex; align-items: baseline; gap: 8px; background: var(--panel); border-radius: 9px; padding: 6px 9px; }
+.row small { color: var(--ink-3); font-size: 11px; width: 52px; flex: none; }
+.row div { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mono { font-family: "JB Mono", ui-monospace, monospace; font-size: 12px; }
+.bad { color: var(--bad); }
+.bar { height: 4px; border-radius: 2px; background: var(--line); margin-top: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--signal); }
+</style></head>
+<body>
+<header><b>●</b><span id="clock">LernHub</span><button id="open" title="LernHub öffnen">öffnen</button><button id="x" title="Widget schließen" aria-label="Widget schließen">✕</button></header>
+<div class="row"><small id="l1">Stunde</small><div id="lesson">…</div></div>
+<div class="row"><small>Test</small><div id="test">…</div></div>
+<div class="row"><small>Heute</small><div><span id="mins">…</span><div class="bar"><i id="bar" style="width:0"></i></div></div></div>
+<script src="widget.js"></script>
+</body></html>
